@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/* Paleta del plan de comercio: vino borgoña + crema + oro viejo */
+:root {
+  --background: #440306;
+  --foreground: #efe6d6;
+  --card: #52070c;
+  --card-foreground: #efe6d6;
+  --muted: #5c0d13;
+  --muted-foreground: #cdb9a5;
+  --primary: #e2c27a;
+  --primary-foreground: #3a0205;
+  --accent: #c9a24a;
+  --border: color-mix(in oklab, #efe6d6 22%, transparent);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --radius-lg: var(--radius);
+  --font-display: "Italiana", "Didot", "Bodoni 72", serif;
+  --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { scroll-behavior: auto; }
+  body {
+    margin: 0;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--color-primary); color: var(--color-primary-foreground); }
+}
+
+/* Título degradado como la portada del PDF */
+.brand-gradient {
+  background: linear-gradient(180deg, #f3e9e9 0%, #d9c3c6 55%, #8a5a62 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Las dos líneas finas del encabezado de cada diapositiva */
+.rule-top { position: relative; }
+.rule-top::before, .rule-top::after {
+  content: ""; position: absolute; top: 0; height: 2px; background: var(--color-foreground); opacity: .85;
+}
+.rule-top::before { left: 5.5%; width: 62%; }
+.rule-top::after { right: 0; width: 11%; }
