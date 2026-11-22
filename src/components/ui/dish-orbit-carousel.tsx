@@ -92,6 +92,8 @@ export type DishOrbitCarouselProps = {
   loop?: boolean
   /** Embedded display face (Outfit, OFL). Pass null to use the host's font. */
   fontSrc?: string | null
+  /** Pixels from the top of the viewport where the stage pins (e.g. under a sticky header). */
+  stickyTop?: number
   /** Crop each plate image to a circle (for regular photos that are not cut-outs). */
   round?: boolean
   /** Override any visible text. */
@@ -290,6 +292,7 @@ export function DishOrbitCarousel({
   loop = true,
   fontSrc = FONT_DATA,
   round = false,
+  stickyTop = 0,
   labels,
   onPlay,
   onOrder,
@@ -427,7 +430,7 @@ export function DishOrbitCarousel({
     if (!track || steps < 1) return
     const trigger = ScrollTrigger.create({
       trigger: track,
-      start: "top top",
+      start: "top " + stickyTop + "px",
       end: "bottom bottom",
       snap: { snapTo: 1 / steps, duration: { min: 0.3, max: 0.8 }, delay: 0.08, ease: "power2.inOut" },
       onUpdate: (self) => {
@@ -466,7 +469,7 @@ export function DishOrbitCarousel({
       trigger.kill()
       stRef.current = null
     }
-  }, [steps, loop, n])
+  }, [steps, loop, n, stickyTop])
 
   // Buttons, keys and swipes jump to a dish and move the scroll to its stretch, so the two stay in step.
   const go = (to: number, dir?: 1 | -1) => {
@@ -505,7 +508,7 @@ export function DishOrbitCarousel({
     <div
       ref={rootRef}
       className={"dsh-root" + (round ? " dsh-round" : "")}
-      style={{ height }}
+      style={{ height, top: stickyTop }}
       role="region"
       aria-roledescription="carousel"
       aria-label={L.region}

@@ -1,19 +1,13 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import App from "./App"
-import { IMAGE_FALLBACKS } from "@/data/wines"
 import "./index.css"
 
-// Si una foto remota no carga, se sustituye por la botella ilustrada.
+// Si una imagen no carga, se oculta en lugar de mostrar el ícono de imagen rota.
 document.addEventListener(
   "error",
   (e) => {
-    const img = e.target
-    if (!(img instanceof HTMLImageElement)) return
-    const src = img.getAttribute("src") ?? ""
-    const fb = IMAGE_FALLBACKS[src]
-    if (fb) img.src = fb
-    else img.style.visibility = "hidden"
+    if (e.target instanceof HTMLImageElement) e.target.style.visibility = "hidden"
   },
   true,
 )

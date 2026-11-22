@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react"
-import { Minus, Plus, Search, ShoppingBag, Trash2, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { SITE, waLink } from "@/lib/site"
-import { formatRD, wines, type Wine } from "@/data/wines"
+import { SITE } from "@/lib/site"
+import { formatRD } from "@/data/wines"
+import { cartTotals, type Cart } from "@/lib/cart"
 
 const AGE_KEY = "tvg-age-ok"
 
@@ -31,21 +32,15 @@ export function AgeGate() {
         <p className="text-xs tracking-[0.35em] text-muted-foreground">BIENVENIDO A</p>
         <h2 id="age-title" className="mt-2 font-display text-5xl brand-gradient">TradeVino Global</h2>
         {denied ? (
-          <p className="mt-6 text-sm leading-relaxed">
-            Lo sentimos. La venta de bebidas alcohólicas es exclusiva para mayores de 18 años.
-          </p>
+          <p className="mt-6 text-sm leading-relaxed">Lo sentimos. La venta de bebidas alcohólicas es exclusiva para mayores de 18 años.</p>
         ) : (
           <>
             <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
               Para entrar debes confirmar que tienes 18 años o más. La venta de alcohol a menores de edad está prohibida en la República Dominicana.
             </p>
             <div className="mt-7 grid grid-cols-2 gap-3">
-              <button onClick={() => setDenied(true)} className="rounded-full border px-4 py-3 text-sm transition hover:bg-white/5">
-                Soy menor
-              </button>
-              <button onClick={accept} className="rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">
-                Tengo 18 o más
-              </button>
+              <button onClick={() => setDenied(true)} className="rounded-full border px-4 py-3 text-sm transition hover:bg-white/5">Soy menor</button>
+              <button onClick={accept} className="rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">Tengo 18 o más</button>
             </div>
           </>
         )}
@@ -54,7 +49,7 @@ export function AgeGate() {
   )
 }
 
-function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
+export function Sheet({ open, onClose, title, children, footer }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; footer?: React.ReactNode }) {
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
@@ -64,19 +59,13 @@ function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () 
   return (
     <div className={cn("fixed inset-0 z-[90] transition", open ? "visible" : "invisible")} aria-hidden={!open}>
       <div onClick={onClose} className={cn("absolute inset-0 bg-black/60 transition-opacity", open ? "opacity-100" : "opacity-0")} />
-      <aside
-        role="dialog"
-        aria-label={title}
-        className={cn(
-          "absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l bg-card shadow-2xl transition-transform duration-300",
-          open ? "translate-x-0" : "translate-x-full",
-        )}
-      >
+      <aside role="dialog" aria-label={title} className={cn("absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l bg-card shadow-2xl transition-transform duration-300", open ? "translate-x-0" : "translate-x-full")}>
         <header className="flex items-center justify-between border-b px-6 py-5">
           <h2 className="font-display text-3xl">{title}</h2>
           <button onClick={onClose} aria-label="Cerrar" className="rounded-full p-2 hover:bg-white/10"><X className="size-5" /></button>
         </header>
         <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
+        {footer && <div className="border-t px-6 py-5">{footer}</div>}
       </aside>
     </div>
   )
@@ -84,7 +73,8 @@ function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () 
 
 export const NAV = [
   { href: "#inicio", label: "Inicio" },
-  { href: "#catalogo", label: "Catálogo" },
+  { href: "#destacados", label: "Destacados" },
+  { href: "#tienda", label: "Tienda" },
   { href: "#recomendador", label: "Recomendador" },
   { href: "#club", label: "Club TradeVino" },
   { href: "#regalos", label: "Cajas de regalo" },
@@ -97,9 +87,7 @@ export function MenuSheet({ open, onClose }: { open: boolean; onClose: () => voi
     <Sheet open={open} onClose={onClose} title="Menú">
       <nav className="flex flex-col">
         {NAV.map((n) => (
-          <a key={n.href} href={n.href} onClick={onClose} className="border-b py-4 font-display text-2xl transition hover:text-primary">
-            {n.label}
-          </a>
+          <a key={n.href} href={n.href} onClick={onClose} className="border-b py-4 font-display text-2xl transition hover:text-primary">{n.label}</a>
         ))}
       </nav>
       <p className="mt-8 text-xs text-muted-foreground">Venta exclusiva a mayores de 18 años · {SITE.domain}</p>
@@ -107,96 +95,57 @@ export function MenuSheet({ open, onClose }: { open: boolean; onClose: () => voi
   )
 }
 
-export function SearchSheet({ open, onClose, onAdd }: { open: boolean; onClose: () => void; onAdd: (w: Wine) => void }) {
-  const [q, setQ] = useState("")
-  const [type, setType] = useState<"Todos" | Wine["type"]>("Todos")
-  const results = useMemo(() => {
-    const s = q.trim().toLowerCase()
-    return wines.filter(
-      (w) =>
-        (type === "Todos" || w.type === type) &&
-        (!s || [w.label, w.grape, w.country, w.kitchen, w.type].join(" ").toLowerCase().includes(s)),
-    )
-  }, [q, type])
+export function CartSheet({ open, onClose, cart, setQty, onCheckout }: { open: boolean; onClose: () => void; cart: Cart; setQty: (key: string, qty: number) => void; onCheckout: () => void }) {
+  const t = cartTotals(cart)
+  const missing = SITE.freeShippingFrom - t.subtotal
   return (
-    <Sheet open={open} onClose={onClose} title="Buscar vinos">
-      <label className="flex items-center gap-3 rounded-full border px-4 py-3">
-        <Search className="size-4 text-muted-foreground" />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Uva, país, nombre…" className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
-      </label>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {(["Todos", "Tinto", "Blanco", "Rosado", "Espumoso"] as const).map((t) => (
-          <button key={t} onClick={() => setType(t)} className={cn("rounded-full border px-3 py-1.5 text-xs transition", type === t ? "bg-primary text-primary-foreground" : "hover:bg-white/5")}>
-            {t}
-          </button>
-        ))}
-      </div>
-      <ul className="mt-6 space-y-3">
-        {results.map((w) => (
-          <li key={w.id} className="flex items-center gap-4 rounded-xl border p-3">
-            <img src={w.image} alt="" className="size-14 rounded-full object-cover" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold">{w.label}</p>
-              <p className="truncate text-xs text-muted-foreground">{w.grape} · {w.country} · {w.vintage}</p>
-              <p className="mt-1 text-sm text-primary">{formatRD(w.price)}</p>
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title="Tu carrito"
+      footer={
+        t.lines.length > 0 && (
+          <>
+            <div className="mb-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (t.subtotal / SITE.freeShippingFrom) * 100)}%` }} />
             </div>
-            <button onClick={() => onAdd(w)} aria-label={"Añadir " + w.label} className="rounded-full bg-primary p-2 text-primary-foreground"><Plus className="size-4" /></button>
-          </li>
-        ))}
-        {results.length === 0 && <li className="text-sm text-muted-foreground">No encontramos vinos con esa búsqueda.</li>}
-      </ul>
-    </Sheet>
-  )
-}
-
-export type Cart = Record<string, number>
-
-export function CartSheet({ open, onClose, cart, setQty }: { open: boolean; onClose: () => void; cart: Cart; setQty: (id: string, qty: number) => void }) {
-  const items = wines.filter((w) => cart[w.id])
-  const total = items.reduce((s, w) => s + w.price * cart[w.id], 0)
-  const message =
-    "Hola TradeVino Global, quiero hacer este pedido:\n" +
-    items.map((w) => `• ${cart[w.id]} x ${w.label} ${w.vintage} (${formatRD(w.price)})`).join("\n") +
-    `\nTotal: ${formatRD(total)}\nConfirmo que soy mayor de 18 años.`
-  return (
-    <Sheet open={open} onClose={onClose} title="Tu carrito">
-      {items.length === 0 ? (
+            <p className="mb-4 text-xs text-muted-foreground">{missing > 0 ? `Te faltan ${formatRD(missing)} para la entrega gratis` : "¡Tienes entrega gratis!"}</p>
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-muted-foreground">Subtotal</span>
+              <span className="font-display text-3xl">{formatRD(t.subtotal)}</span>
+            </div>
+            <button onClick={onCheckout} className="mt-4 w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition hover:brightness-110">Finalizar compra</button>
+            <p className="mt-3 text-center text-xs text-muted-foreground">Pago seguro con Azul / CardNet · Verificación de edad +18</p>
+          </>
+        )
+      }
+    >
+      {t.lines.length === 0 ? (
         <div className="grid place-items-center gap-3 py-16 text-center text-muted-foreground">
           <ShoppingBag className="size-10 opacity-60" />
-          <p className="text-sm">Tu carrito está vacío. Explora el catálogo y añade tus vinos favoritos.</p>
+          <p className="text-sm">Tu carrito está vacío. Explora la tienda y añade tus vinos favoritos.</p>
         </div>
       ) : (
-        <div className="flex h-full flex-col">
-          <ul className="space-y-3">
-            {items.map((w) => (
-              <li key={w.id} className="flex items-center gap-4 rounded-xl border p-3">
-                <img src={w.image} alt="" className="size-14 rounded-full object-cover" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold">{w.label}</p>
-                  <p className="text-xs text-muted-foreground">{formatRD(w.price)} c/u</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <button onClick={() => setQty(w.id, cart[w.id] - 1)} aria-label="Quitar uno" className="rounded-full border p-1"><Minus className="size-3" /></button>
-                    <span className="w-6 text-center text-sm">{cart[w.id]}</span>
-                    <button onClick={() => setQty(w.id, cart[w.id] + 1)} aria-label="Añadir uno" className="rounded-full border p-1"><Plus className="size-3" /></button>
-                  </div>
+        <ul className="space-y-3">
+          {t.lines.map((l) => (
+            <li key={l.key} className="flex items-center gap-4 rounded-xl border p-3">
+              <img src={l.wine.image} alt="" className="size-16 rounded-lg object-cover" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">{l.wine.name}</p>
+                <p className="text-xs text-muted-foreground">{l.format === "caja" ? "Caja de 6" : "Botella"} · {formatRD(l.unit)}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <button onClick={() => setQty(l.key, l.qty - 1)} aria-label="Quitar uno" className="rounded-full border p-1"><Minus className="size-3" /></button>
+                  <span className="w-6 text-center text-sm">{l.qty}</span>
+                  <button onClick={() => setQty(l.key, l.qty + 1)} aria-label="Añadir uno" className="rounded-full border p-1"><Plus className="size-3" /></button>
                 </div>
-                <button onClick={() => setQty(w.id, 0)} aria-label="Eliminar" className="rounded-full p-2 text-muted-foreground hover:bg-white/10"><Trash2 className="size-4" /></button>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-6 border-t pt-5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-muted-foreground">Total</span>
-              <span className="font-display text-3xl">{formatRD(total)}</span>
-            </div>
-            <a href={waLink(message)} target="_blank" rel="noreferrer" className="mt-5 block rounded-full bg-primary py-3 text-center text-sm font-semibold text-primary-foreground transition hover:brightness-110">
-              Confirmar pedido por WhatsApp
-            </a>
-            <p className="mt-3 text-center text-xs text-muted-foreground">
-              Pago seguro con tarjeta (Azul / CardNet). Entregas rápidas con empaque protegido.
-            </p>
-          </div>
-        </div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <span className="text-sm">{formatRD(l.total)}</span>
+                <button onClick={() => setQty(l.key, 0)} aria-label="Eliminar" className="rounded-full p-1.5 text-muted-foreground hover:bg-white/10"><Trash2 className="size-4" /></button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </Sheet>
   )

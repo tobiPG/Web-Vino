@@ -2,197 +2,258 @@ import type { Dish } from "@/components/ui/dish-orbit-carousel"
 
 /*
  * Catálogo de ejemplo de TradeVino Global.
- * Cada vino reutiliza la forma `Dish` del carrusel:
- *   title / subtitle  -> línea fina (tipo/uva) y línea gruesa (nombre)
- *   chef / kitchen    -> línea de la casa y origen + añada
- *   ingredients       -> pestaña "Notas de cata": uva, aromas y graduación
- *   likes             -> número de reseñas
- * Reemplazar por el inventario real (Google Sheets / WooCommerce).
+ * Fotos reales de Unsplash (licencia libre) guardadas en /public/img.
+ * Reemplazar por el inventario y las fotos reales de la tienda.
  */
 
-export type Wine = Dish & {
+export type WineType = "Tinto" | "Blanco" | "Rosado" | "Espumoso"
+export type Taste = "intenso" | "suave" | "fresco" | "dulce"
+
+export type Wine = {
   id: string
-  type: "Tinto" | "Blanco" | "Rosado" | "Espumoso"
+  name: string
+  /** Línea fina y línea gruesa del carrusel. */
+  line1: string
+  line2: string
+  type: WineType
   country: string
+  region: string
   grape: string
   vintage: string
   price: number
-  /** Etiquetas usadas por el recomendador. */
-  taste: Array<"intenso" | "suave" | "fresco" | "dulce">
+  oldPrice?: number
+  rating: number
+  reviews: number
+  stock: number
+  abv: string
+  temp: string
+  aging: string
+  notes: string[]
+  description: string
+  image: string
+  alt: string
+  badge?: string
+  accent: string
+  taste: Taste[]
+  sales: number
 }
 
-/** Fotos de Unsplash (licencia libre). Se recortan en círculo dentro del carrusel. */
-const u = (id: string, w = 700) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&h=${w}&q=80`
+const img = (f: string) => `/img/${f}`
 
 export const IMAGES = {
-  hero: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=2000&q=80",
-  cellar: "https://images.unsplash.com/photo-1504279577054-acfeccf8fc52?auto=format&fit=crop&w=1600&q=70",
-  grapes: "https://images.unsplash.com/photo-1423483641154-5411ec9c0ddf?auto=format&fit=crop&w=1200&q=75",
-  toast: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=75",
-  bottles: "https://images.unsplash.com/photo-1474722883778-792e7990302f?auto=format&fit=crop&w=1200&q=75",
-  pour: "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=1200&q=75",
+  hero: img("hero-cellar.jpg"),
+  vineyard: img("vineyard.jpg"),
+  grapes: img("grapes.jpg"),
+  toast: img("toast.jpg"),
+  shelf: img("shelf.jpg"),
+  cellarWall: img("cellar-wall.jpg"),
+  tasting: img("tasting.jpg"),
+  glassGrapes: img("glass-grapes.jpg"),
 }
 
 export const wines: Wine[] = [
   {
-    id: "malbec-reserva",
+    id: "montepulciano",
+    name: "Montepulciano d'Abruzzo",
+    line1: "Montepulciano",
+    line2: "d'Abruzzo",
+    type: "Tinto",
+    country: "Italia",
+    region: "Abruzzo",
+    grape: "Montepulciano",
+    vintage: "2020",
+    price: 1650,
+    oldPrice: 1890,
+    rating: 4.6,
+    reviews: 142,
+    stock: 24,
+    abv: "13.5% vol.",
+    temp: "16–18 °C",
+    aging: "6 meses en roble",
+    notes: ["Cereza negra", "Ciruela", "Especias suaves", "Taninos redondos"],
+    description: "Tinto italiano jugoso y amable: cereza negra, ciruela y un toque especiado. Fácil de disfrutar en cualquier momento.",
+    image: img("b-montepulciano.jpg"),
+    alt: "Botella de Montepulciano d'Abruzzo sobre fondo negro",
+    badge: "Oferta",
+    accent: "#b23a48",
+    taste: ["suave", "intenso"],
+    sales: 310,
+  },
+  {
+    id: "pinot-noir",
+    name: "Pinot Noir Reserva",
+    line1: "Pinot Noir",
+    line2: "Reserva",
+    type: "Tinto",
+    country: "Chile",
+    region: "Valle de Elqui",
+    grape: "Pinot Noir",
+    vintage: "2013",
+    price: 2250,
+    rating: 4.8,
+    reviews: 96,
+    stock: 9,
+    abv: "13.5% vol.",
+    temp: "14–16 °C",
+    aging: "10 meses en barrica francesa",
+    notes: ["Frambuesa", "Cereza", "Tierra húmeda", "Final elegante"],
+    description: "Pinot Noir de altura, delicado y aromático: frambuesa, cereza y notas terrosas con una acidez muy fresca.",
+    image: img("b-pinot.jpg"),
+    alt: "Botella de Pinot Noir junto a una copa de vino tinto",
+    badge: "Premium",
+    accent: "#9b3550",
+    taste: ["suave", "fresco"],
+    sales: 180,
+  },
+  {
+    id: "cabernet",
+    name: "Cabernet Sauvignon",
+    line1: "Cabernet",
+    line2: "Sauvignon",
+    type: "Tinto",
+    country: "Estados Unidos",
+    region: "Texas",
+    grape: "Cabernet Sauvignon",
+    vintage: "2019",
+    price: 2450,
+    rating: 4.7,
+    reviews: 74,
+    stock: 15,
+    abv: "14.2% vol.",
+    temp: "16–18 °C",
+    aging: "14 meses en roble americano",
+    notes: ["Cassis", "Mora", "Cacao", "Vainilla"],
+    description: "Cabernet estructurado y profundo: cassis, mora y cacao, con un final largo de vainilla y especias.",
+    image: img("b-cabernet.jpg"),
+    alt: "Botella de Cabernet Sauvignon en una cava",
+    badge: "Nuevo",
+    accent: "#8e3b5a",
+    taste: ["intenso"],
+    sales: 140,
+  },
+  {
+    id: "malbec",
+    name: "Malbec Reserva",
+    line1: "Malbec",
+    line2: "Reserva",
     type: "Tinto",
     country: "Argentina",
+    region: "Mendoza",
     grape: "Malbec",
     vintage: "2021",
     price: 1850,
-    title: "Malbec",
-    subtitle: "Reserva",
-    label: "Malbec Reserva",
-    eyebrow: "#1 Más vendido · Argentina",
-    image: u("1510812431401-41d2bd2722f3"),
-    alt: "Dos copas de vino tinto",
     rating: 4.8,
-    chef: "Selección TradeVino",
-    kitchen: "Mendoza, Argentina · Añada 2021",
-    description: "Ciruela madura, violeta y un toque de vainilla tras 12 meses en roble. Taninos suaves y final largo. RD$ 1,850.",
-    likes: 214,
-    ingredients: ["Malbec 100%", "Ciruela", "Violeta", "Vainilla", "12 meses en roble", "14% vol."],
-    accent: "#b23a48",
-    taste: ["intenso"],
-  },
-  {
-    id: "tempranillo-crianza",
-    type: "Tinto",
-    country: "España",
-    grape: "Tempranillo",
-    vintage: "2019",
-    price: 2100,
-    title: "Rioja",
-    subtitle: "Crianza",
-    label: "Rioja Crianza",
-    eyebrow: "#2 Favorito de la casa · España",
-    image: u("1553361371-9b22f78e8b1d"),
-    alt: "Vino tinto sirviéndose en una copa",
-    rating: 4.7,
-    chef: "Selección TradeVino",
-    kitchen: "La Rioja, España · Añada 2019",
-    description: "Cereza, especias dulces y cuero fino. Elegante, equilibrado y con gran persistencia. RD$ 2,100.",
-    likes: 176,
-    ingredients: ["Tempranillo", "Cereza", "Especias dulces", "Cuero", "Crianza en barrica", "13.5% vol."],
+    reviews: 214,
+    stock: 30,
+    abv: "14% vol.",
+    temp: "16–18 °C",
+    aging: "12 meses en roble",
+    notes: ["Ciruela madura", "Violeta", "Vainilla", "Taninos suaves"],
+    description: "Ciruela madura, violeta y un toque de vainilla tras 12 meses en roble. Taninos suaves y final largo.",
+    image: img("b-malbec.jpg"),
+    alt: "Vino tinto Malbec sirviéndose en una copa",
+    badge: "Más vendido",
     accent: "#c2703d",
     taste: ["intenso", "suave"],
+    sales: 420,
+  },
+  {
+    id: "nimes",
+    name: "Costières de Nîmes",
+    line1: "Costières",
+    line2: "de Nîmes",
+    type: "Tinto",
+    country: "Francia",
+    region: "Ródano",
+    grape: "Garnacha · Syrah",
+    vintage: "2020",
+    price: 1550,
+    rating: 4.4,
+    reviews: 58,
+    stock: 18,
+    abv: "13.5% vol.",
+    temp: "15–17 °C",
+    aging: "Crianza en depósito",
+    notes: ["Frutos rojos", "Pimienta", "Garriga", "Fresco y ligero"],
+    description: "Tinto del sur de Francia, ligero y especiado: frutos rojos, pimienta y hierbas mediterráneas.",
+    image: img("b-nimes.jpg"),
+    alt: "Botella de vino tinto francés junto a una copa",
+    accent: "#a8454f",
+    taste: ["suave", "fresco"],
+    sales: 120,
   },
   {
     id: "sauvignon-blanc",
+    name: "Sauvignon Blanc",
+    line1: "Sauvignon",
+    line2: "Blanc",
     type: "Blanco",
     country: "Chile",
+    region: "Valle de Casablanca",
     grape: "Sauvignon Blanc",
     vintage: "2023",
     price: 1250,
-    title: "Blanco",
-    subtitle: "Sauvignon",
-    label: "Sauvignon Blanc",
-    eyebrow: "#3 Fresco del Pacífico · Chile",
-    image: u("1566995541428-f2246c17cda1"),
-    alt: "Copa de vino blanco frío",
     rating: 4.5,
-    chef: "Selección TradeVino",
-    kitchen: "Valle de Casablanca, Chile · Añada 2023",
-    description: "Cítricos, maracuyá y hierba recién cortada. Vibrante y fresco, perfecto para el clima del Caribe. RD$ 1,250.",
-    likes: 132,
-    ingredients: ["Sauvignon Blanc", "Cítricos", "Maracuyá", "Hierba fresca", "Servir a 8 °C", "12.5% vol."],
+    reviews: 132,
+    stock: 26,
+    abv: "12.5% vol.",
+    temp: "8–10 °C",
+    aging: "Sin barrica",
+    notes: ["Cítricos", "Maracuyá", "Hierba fresca", "Acidez viva"],
+    description: "Cítricos, maracuyá y hierba recién cortada. Vibrante y fresco, perfecto para el clima del Caribe.",
+    image: img("b-blanco.jpg"),
+    alt: "Copa de vino blanco",
     accent: "#d8c46a",
     taste: ["fresco"],
+    sales: 260,
   },
   {
-    id: "rose-provenza",
+    id: "rose",
+    name: "Rosé de Provenza",
+    line1: "Rosé",
+    line2: "Provenza",
     type: "Rosado",
     country: "Francia",
+    region: "Provenza",
     grape: "Garnacha · Cinsault",
     vintage: "2023",
     price: 1950,
-    title: "Rosé",
-    subtitle: "Provenza",
-    label: "Rosé de Provenza",
-    eyebrow: "#4 Para la terraza · Francia",
-    image: u("1558001373-7b93ee48ffa0"),
-    alt: "Copas de vino rosado al atardecer",
     rating: 4.6,
-    chef: "Selección TradeVino",
-    kitchen: "Provenza, Francia · Añada 2023",
-    description: "Fresa silvestre, pomelo y un fondo mineral. Seco, ligero y muy elegante. RD$ 1,950.",
-    likes: 98,
-    ingredients: ["Garnacha", "Cinsault", "Fresa silvestre", "Pomelo", "Mineral", "12.5% vol."],
+    reviews: 98,
+    stock: 12,
+    abv: "12.5% vol.",
+    temp: "8–10 °C",
+    aging: "Sin barrica",
+    notes: ["Fresa silvestre", "Pomelo", "Mineral", "Seco"],
+    description: "Fresa silvestre, pomelo y un fondo mineral. Seco, ligero y muy elegante.",
+    image: img("b-rose.jpg"),
+    alt: "Copas de vino rosado",
     accent: "#e79aa6",
-    taste: ["fresco", "suave"],
-  },
-  {
-    id: "cava-brut",
-    type: "Espumoso",
-    country: "España",
-    grape: "Macabeo · Xarel·lo · Parellada",
-    vintage: "NV",
-    price: 1650,
-    title: "Espumoso",
-    subtitle: "Cava Brut",
-    label: "Cava Brut",
-    eyebrow: "#5 Para celebrar · España",
-    image: u("1543418219-44e30b057fea"),
-    alt: "Brindis con copas de espumoso",
-    rating: 4.4,
-    chef: "Selección TradeVino",
-    kitchen: "Penedès, España · Método tradicional",
-    description: "Burbuja fina, manzana verde y notas tostadas. El brindis perfecto para bodas, cumpleaños y eventos. RD$ 1,650.",
-    likes: 121,
-    ingredients: ["Macabeo", "Xarel·lo", "Parellada", "Manzana verde", "Burbuja fina", "11.5% vol."],
-    accent: "#e8d7a8",
-    taste: ["fresco", "dulce"],
-  },
-  {
-    id: "cabernet-maipo",
-    type: "Tinto",
-    country: "Chile",
-    grape: "Cabernet Sauvignon",
-    vintage: "2020",
-    price: 1450,
-    title: "Cabernet",
-    subtitle: "Sauvignon",
-    label: "Cabernet Maipo",
-    eyebrow: "#6 Mejor precio-calidad · Chile",
-    image: u("1474722883778-792e7990302f"),
-    alt: "Botellas de vino tinto en una cava",
-    rating: 4.5,
-    chef: "Selección TradeVino",
-    kitchen: "Valle del Maipo, Chile · Añada 2020",
-    description: "Cassis, pimiento asado y cacao. Estructurado y redondo, un clásico que nunca falla. RD$ 1,450.",
-    likes: 188,
-    ingredients: ["Cabernet Sauvignon", "Cassis", "Pimiento asado", "Cacao", "Taninos firmes", "13.5% vol."],
-    accent: "#8e3b5a",
-    taste: ["intenso"],
+    taste: ["fresco", "suave", "dulce"],
+    sales: 150,
   },
 ]
 
-/** Botella ilustrada (estilo del plan de comercio) por si una foto no carga. */
-function bottleSvg(fill: string, label: string) {
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245 245">` +
-    `<circle cx="122.5" cy="122.5" r="118" fill="#5a0a10"/>` +
-    `<circle cx="122.5" cy="122.5" r="104" fill="none" stroke="${label}" stroke-opacity=".35" stroke-width="1.5"/>` +
-    `<path d="M112 34h21v34c0 10 22 22 22 46v86c0 8-6 12-13 12h-39c-7 0-13-4-13-12v-86c0-24 22-36 22-46z" fill="${fill}"/>` +
-    `<rect x="112" y="30" width="21" height="14" rx="2" fill="#c9a24a"/>` +
-    `<rect x="93" y="132" width="59" height="44" rx="3" fill="${label}"/>` +
-    `<path d="M104 146h37M108 156h29M112 165h21" stroke="#5a0a10" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>` +
-    `<path d="M101 104c2-12 8-18 11-22" stroke="#fff" stroke-opacity=".25" stroke-width="5" stroke-linecap="round" fill="none"/>` +
-    `</svg>`
-  return "data:image/svg+xml;utf8," + encodeURIComponent(svg)
+export const CASE_SIZE = 6
+export const CASE_DISCOUNT = 0.1
+
+export const formatRD = (n: number) => "RD$ " + Math.round(n).toLocaleString("es-DO")
+
+/** Adapta un vino a la forma que espera el carrusel orbital. */
+export function toDish(w: Wine, i: number): Dish {
+  return {
+    title: w.line1,
+    subtitle: w.line2,
+    label: w.name,
+    eyebrow: `#${i + 1} ${w.type} · ${w.country}`,
+    image: w.image,
+    alt: w.alt,
+    rating: w.rating,
+    chef: formatRD(w.price),
+    kitchen: `${w.region}, ${w.country} · Añada ${w.vintage}`,
+    description: w.description,
+    likes: w.reviews,
+    ingredients: [w.grape, ...w.notes, w.abv],
+    accent: w.accent,
+  }
 }
-
-const FALLBACK_BY_TYPE: Record<Wine["type"], string> = {
-  Tinto: bottleSvg("#2a0d14", "#efe6d6"),
-  Blanco: bottleSvg("#9fae5a", "#efe6d6"),
-  Rosado: bottleSvg("#d98a95", "#efe6d6"),
-  Espumoso: bottleSvg("#2f4a2c", "#e8d7a8"),
-}
-
-/** URL de imagen -> ilustración de respaldo. */
-export const IMAGE_FALLBACKS: Record<string, string> = Object.fromEntries(
-  wines.map((w) => [w.image, FALLBACK_BY_TYPE[w.type]]),
-)
-
-export const formatRD = (n: number) => "RD$ " + n.toLocaleString("es-DO")
