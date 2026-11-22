@@ -5,7 +5,7 @@ import type { Dish } from "@/components/ui/dish-orbit-carousel"
  * Cada vino reutiliza la forma `Dish` del carrusel:
  *   title / subtitle  -> línea fina (tipo/uva) y línea gruesa (nombre)
  *   chef / kitchen    -> línea de la casa y origen + añada
- *   ingredients       -> pestaña "Maridaje": uva, notas y comidas
+ *   ingredients       -> pestaña "Notas de cata": uva, aromas y graduación
  *   likes             -> número de reseñas
  * Reemplazar por el inventario real (Google Sheets / WooCommerce).
  */
@@ -18,7 +18,6 @@ export type Wine = Dish & {
   vintage: string
   price: number
   /** Etiquetas usadas por el recomendador. */
-  pairsWith: Array<"carnes" | "pescados" | "pastas" | "quesos" | "postres" | "aperitivo">
   taste: Array<"intenso" | "suave" | "fresco" | "dulce">
 }
 
@@ -53,9 +52,8 @@ export const wines: Wine[] = [
     kitchen: "Mendoza, Argentina · Añada 2021",
     description: "Ciruela madura, violeta y un toque de vainilla tras 12 meses en roble. Taninos suaves y final largo. RD$ 1,850.",
     likes: 214,
-    ingredients: ["Malbec 100%", "Carnes a la parrilla", "Chivo guisado", "Quesos curados", "14% vol."],
+    ingredients: ["Malbec 100%", "Ciruela", "Violeta", "Vainilla", "12 meses en roble", "14% vol."],
     accent: "#b23a48",
-    pairsWith: ["carnes", "quesos"],
     taste: ["intenso"],
   },
   {
@@ -74,11 +72,10 @@ export const wines: Wine[] = [
     rating: 4.7,
     chef: "Selección TradeVino",
     kitchen: "La Rioja, España · Añada 2019",
-    description: "Cereza, especias dulces y cuero fino. Elegante y equilibrado, ideal para la mesa del domingo. RD$ 2,100.",
+    description: "Cereza, especias dulces y cuero fino. Elegante, equilibrado y con gran persistencia. RD$ 2,100.",
     likes: 176,
-    ingredients: ["Tempranillo", "Cordero", "Embutidos", "Pastas con salsa roja", "13.5% vol."],
+    ingredients: ["Tempranillo", "Cereza", "Especias dulces", "Cuero", "Crianza en barrica", "13.5% vol."],
     accent: "#c2703d",
-    pairsWith: ["carnes", "pastas", "quesos"],
     taste: ["intenso", "suave"],
   },
   {
@@ -99,9 +96,8 @@ export const wines: Wine[] = [
     kitchen: "Valle de Casablanca, Chile · Añada 2023",
     description: "Cítricos, maracuyá y hierba recién cortada. Vibrante y fresco, perfecto para el clima del Caribe. RD$ 1,250.",
     likes: 132,
-    ingredients: ["Sauvignon Blanc", "Mariscos", "Ceviche", "Pescado a la plancha", "12.5% vol."],
+    ingredients: ["Sauvignon Blanc", "Cítricos", "Maracuyá", "Hierba fresca", "Servir a 8 °C", "12.5% vol."],
     accent: "#d8c46a",
-    pairsWith: ["pescados", "aperitivo"],
     taste: ["fresco"],
   },
   {
@@ -122,9 +118,8 @@ export const wines: Wine[] = [
     kitchen: "Provenza, Francia · Añada 2023",
     description: "Fresa silvestre, pomelo y un fondo mineral. Seco, ligero y muy elegante. RD$ 1,950.",
     likes: 98,
-    ingredients: ["Garnacha", "Cinsault", "Ensaladas", "Sushi", "Tapas", "12.5% vol."],
+    ingredients: ["Garnacha", "Cinsault", "Fresa silvestre", "Pomelo", "Mineral", "12.5% vol."],
     accent: "#e79aa6",
-    pairsWith: ["pescados", "aperitivo"],
     taste: ["fresco", "suave"],
   },
   {
@@ -143,11 +138,10 @@ export const wines: Wine[] = [
     rating: 4.4,
     chef: "Selección TradeVino",
     kitchen: "Penedès, España · Método tradicional",
-    description: "Burbuja fina, manzana verde y pan tostado. El brindis perfecto para bodas, cumpleaños y eventos. RD$ 1,650.",
+    description: "Burbuja fina, manzana verde y notas tostadas. El brindis perfecto para bodas, cumpleaños y eventos. RD$ 1,650.",
     likes: 121,
-    ingredients: ["Macabeo", "Xarel·lo", "Parellada", "Aperitivos", "Postres ligeros", "11.5% vol."],
+    ingredients: ["Macabeo", "Xarel·lo", "Parellada", "Manzana verde", "Burbuja fina", "11.5% vol."],
     accent: "#e8d7a8",
-    pairsWith: ["aperitivo", "postres", "pescados"],
     taste: ["fresco", "dulce"],
   },
   {
@@ -168,9 +162,8 @@ export const wines: Wine[] = [
     kitchen: "Valle del Maipo, Chile · Añada 2020",
     description: "Cassis, pimiento asado y cacao. Estructurado y redondo, un clásico que nunca falla. RD$ 1,450.",
     likes: 188,
-    ingredients: ["Cabernet Sauvignon", "Churrasco", "Hamburguesas", "Lasaña", "13.5% vol."],
+    ingredients: ["Cabernet Sauvignon", "Cassis", "Pimiento asado", "Cacao", "Taninos firmes", "13.5% vol."],
     accent: "#8e3b5a",
-    pairsWith: ["carnes", "pastas"],
     taste: ["intenso"],
   },
 ]

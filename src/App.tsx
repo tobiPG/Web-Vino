@@ -53,7 +53,7 @@ export default function App() {
           play: "Ver cata virtual",
           order: "Añadir al carrito",
           overview: "Descripción",
-          ingredients: "Maridaje",
+          ingredients: "Notas de cata",
           likes: "reseñas",
           dislike: "No es para mí",
           search: "Buscar vinos",

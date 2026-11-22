@@ -69,7 +69,7 @@ export function CatalogIntro() {
   return (
     <div id="catalogo" className="rule-top mx-auto max-w-7xl px-4 pb-6 pt-24 sm:px-8">
       <SectionTitle kicker="CATÁLOGO DIGITAL 24 HORAS" title="Nuestra selección">
-        Desliza para recorrer la bodega. Cada etiqueta muestra país, uva, añada y maridaje para que elijas con confianza.
+        Desliza para recorrer la bodega. Cada etiqueta muestra país, uva, añada y notas de cata para que elijas con confianza.
       </SectionTitle>
     </div>
   )
@@ -79,7 +79,7 @@ const VALUES = [
   { icon: ShieldCheck, title: "Vinos selectos con garantía", text: "Cada botella llega de bodegas e importadores verificados y se guarda en almacén con temperatura controlada." },
   { icon: PackageCheck, title: "Compra segura y sencilla", text: "Pago protegido con Azul y CardNet, con verificación de mayoría de edad en cada pedido." },
   { icon: Clock, title: "Catálogo digital 24 horas", text: "Explora y pide cuando quieras, desde el móvil o la computadora." },
-  { icon: Sparkles, title: "Recomendador personalizado", text: "Te sugerimos el vino ideal según tu gusto, tu comida y tu presupuesto." },
+  { icon: Sparkles, title: "Recomendador personalizado", text: "Te sugerimos el vino ideal según tu gusto, el tipo de vino y tu presupuesto." },
   { icon: Truck, title: "Entregas rápidas", text: "Empaque protegido para que cada botella llegue perfecta." },
   { icon: Headset, title: "Atención experta", text: "Te acompañamos antes, durante y después de la compra por WhatsApp y chat." },
 ]
@@ -102,18 +102,18 @@ export function Values() {
 }
 
 type Taste = Wine["taste"][number]
-type Food = Wine["pairsWith"][number]
+type Kind = "Todos" | Wine["type"]
 
 export function Recommender({ onAdd }: { onAdd: (w: Wine) => void }) {
   const [taste, setTaste] = useState<Taste>("intenso")
-  const [food, setFood] = useState<Food>("carnes")
+  const [kind, setKind] = useState<Kind>("Todos")
   const [budget, setBudget] = useState(2000)
   const pick = useMemo(() => {
     const scored = wines
-      .map((w) => ({ w, s: (w.taste.includes(taste) ? 2 : 0) + (w.pairsWith.includes(food) ? 2 : 0) + (w.price <= budget ? 1.5 : -3) + w.rating / 10 }))
+      .map((w) => ({ w, s: (w.taste.includes(taste) ? 2 : 0) + (kind === "Todos" || w.type === kind ? 3 : -5) + (w.price <= budget ? 1.5 : -3) + w.rating / 10 }))
       .sort((a, b) => b.s - a.s)
     return scored[0].w
-  }, [taste, food, budget])
+  }, [taste, kind, budget])
 
   const chip = (active: boolean) =>
     "rounded-full border px-4 py-2 text-sm capitalize transition " + (active ? "bg-primary text-primary-foreground" : "hover:bg-white/5")
@@ -123,11 +123,11 @@ export function Recommender({ onAdd }: { onAdd: (w: Wine) => void }) {
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
           <SectionTitle kicker="RECOMENDADOR DE VINOS" title="¿No sabes cuál elegir?">
-            Cuéntanos qué te gusta, qué vas a comer y cuánto quieres invertir. Te sugerimos la botella ideal.
+            Cuéntanos qué estilo te gusta, qué tipo de vino prefieres y cuánto quieres invertir. Te sugerimos la botella ideal.
           </SectionTitle>
           <div className="mt-10 space-y-7">
             <div>
-              <p className="mb-3 text-xs tracking-[0.25em] text-muted-foreground">TU GUSTO</p>
+              <p className="mb-3 text-xs tracking-[0.25em] text-muted-foreground">ESTILO</p>
               <div className="flex flex-wrap gap-2">
                 {(["intenso", "suave", "fresco", "dulce"] as Taste[]).map((t) => (
                   <button key={t} className={chip(taste === t)} onClick={() => setTaste(t)}>{t}</button>
@@ -135,10 +135,10 @@ export function Recommender({ onAdd }: { onAdd: (w: Wine) => void }) {
               </div>
             </div>
             <div>
-              <p className="mb-3 text-xs tracking-[0.25em] text-muted-foreground">LA COMIDA</p>
+              <p className="mb-3 text-xs tracking-[0.25em] text-muted-foreground">TIPO DE VINO</p>
               <div className="flex flex-wrap gap-2">
-                {(["carnes", "pescados", "pastas", "quesos", "postres", "aperitivo"] as Food[]).map((f) => (
-                  <button key={f} className={chip(food === f)} onClick={() => setFood(f)}>{f}</button>
+                {(["Todos", "Tinto", "Blanco", "Rosado", "Espumoso"] as Kind[]).map((k) => (
+                  <button key={k} className={chip(kind === k)} onClick={() => setKind(k)}>{k}</button>
                 ))}
               </div>
             </div>
@@ -222,7 +222,7 @@ export function ClubAndGifts() {
 const SEGMENTS = [
   { icon: UtensilsCrossed, title: "Restaurantes", text: "Carta de vinos a la medida y precios por volumen." },
   { icon: Hotel, title: "Hoteles", text: "Abastecimiento recurrente para habitaciones, bares y eventos." },
-  { icon: CalendarHeart, title: "Eventos", text: "Bodas, galas y eventos corporativos con asesoría de maridaje." },
+  { icon: CalendarHeart, title: "Eventos", text: "Bodas, galas y eventos corporativos con asesoría de nuestros expertos." },
   { icon: Building2, title: "Regalos corporativos", text: "Cajas personalizadas con tu marca para clientes y equipos." },
 ]
 
